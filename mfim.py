@@ -37,10 +37,20 @@ class MFIM:
         self.I, self.sx_list, self.sy_list, self.sz_list = self.gen_s0sxsysz()
         self.H = self.hz * sum(self.sz_list) + self.hx * sum(self.sx_list)
 
-        for i in range(self.L):
+        if np.isscalar(self.J):
+            for i in range(self.L-1):
 
-            self.H += -self.J * self.sz_list[i] * self.sz_list[(i+1)%self.L]
+                self.H += -self.J * self.sz_list[i] * self.sz_list[(i+1)]
         
+        else:
+            J12, J13, J14, J23, J24, J34 = self.J
+            self.H += (   J12*self.sz_list[0]*self.sz_list[1]
+                        + J13*self.sz_list[0]*self.sz_list[2]
+                        + J14*self.sz_list[0]*self.sz_list[3]
+                        + J23*self.sz_list[1]*self.sz_list[2]
+                        + J24*self.sz_list[1]*self.sz_list[3]
+                        + J34*self.sz_list[2]*self.sz_list[3])
+            
         return 1
     
     def gen_s0sxsysz(self):
